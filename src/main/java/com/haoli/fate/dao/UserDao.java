@@ -13,4 +13,6 @@ public interface UserDao {
 
 	Integer add(User user);
 
+	User loadUserByPhone(String phone);
+
 }
