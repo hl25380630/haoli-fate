@@ -2,7 +2,19 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.haoli.fate.dao.UserDao">
 
-  	<sql id="CommonQuery">
+	<sql id="CommonUpdate">
+		<if test="avatar != null and avatar != ''">
+			avatar = #{avatar},
+		</if>
+		<if test="userName != null and userName != ''">
+			userName = #{userName},
+		</if>
+		<if test="email != null and email != ''">
+			email = #{email},
+		</if>
+	</sql>
+	
+	<sql id="CommonQuery">
         <if test="id != null ">
             and id=#{id}
         </if>
@@ -17,16 +29,16 @@
             and endDate <![CDATA[<]]> #{createTime}
         </if>
     </sql>
-
-	<select id="queryUser" parameterType="java.util.Map" resultType="com.haoli.personalSite.domain.User">
+	
+	<select id="queryUser" parameterType="java.util.Map" resultType="com.haoli.fate.domain.User">
 		select * from
 			t_user
 		<where>
 			<include refid="CommonQuery"/>
 		</where>
 	</select>
-	
-	<insert id="add" parameterType="com.haoli.personalSite.domain.User">
+
+	<insert id="add" parameterType="com.haoli.fate.domain.User">
 		insert into
 			t_user(
 				userName,
@@ -44,61 +56,93 @@
 				#{createTime}
 			)
 	</insert>
-
-    <insert id="batchAdd" parameterType="java.util.Map">
-		insert into 
-		    t_guest_attribute (
-		        conferenceId,
-		        guestId,
-	 	        attributeId,
-	 	        value,
-	 	        isEmbeded,
-	 		    createTime
-	 		)
- 		values
- 		<foreach collection="list" item="item" index="index" separator=",">
- 			(
- 			    #{item.conferenceId},
- 			    #{item.guestId},
- 			    #{item.attributeId},
- 			    #{item.value},
- 			    #{item.isEmbeded},
- 			    #{item.createTime}
- 			)
- 		</foreach>
-	</insert>
-
-	<update id="batchUpdate" parameterType="java.util.Map">
-		<foreach collection="list" item="item" index="index" open="" close="" separator=";">
-			update 
-				t_guest_attribute
-		    set
-		        value = #{item.value},
-		        updateTime = #{item.updateTime}
-			where 
-			    id = #{item.id}
-		</foreach>
+	
+	<update id="update" parameterType="java.util.Map">
+		update
+			t_user
+		<set>
+			<include refid="CommonUpdate"/>
+			updateTime = #{updateTime}
+		</set>
+		where
+			id = #{userId}
 	</update>
 	
-	<select id="batchQuery" parameterType="java.util.Map" resultType="java.util.Map">
-	    select
+	<select id="loadById" parameterType = "java.lang.Long" resultType="com.haoli.fate.domain.User">
+		select
+		    id,
+		    phone,
+		    avatar,
+		    email,
+		    userName,
+		    password,
+		    salt
+		from
+			t_user
+		where
+		    id=#{id}
+	</select>
+	
+	<update id="resetPwd" parameterType = "com.haoli.fate.domain.User">
+		update
+			t_user
+    	set
+			salt=#{salt},
+			password=#{password},
+    		updateTime = #{updateTime}
+		where
+			id = #{id}
+	</update>
+	
+	<select id="loadUserByPhone"  parameterType="java.lang.String" resultType="com.haoli.fate.domain.User">
+    	select 
+    		id,
+		    phone,
+		    userName,
+		    password,
+		    salt
+    	from
+    		t_user
+    	where
+    		phone=#{phone}
+    </select>
+    
+    <select id="getUserInviteGuestNo" parameterType="java.util.Map" resultType="java.lang.Long">
+    	select
+    		count(1)
+    	from
+    		t_guest
+    	where
+    		conferenceId = #{conferenceId}
+    		and createUserId = #{userId}
+    </select>
+    
+    <select id="getUserInviteAgentQuota" parameterType="java.util.Map" resultType="java.lang.Long">
+    	select
+    		sum(totalAmount)
+    	from
+    		t_agent
+    	where
+    		conferenceId = #{conferenceId}
+    		and inviteBy = #{userId}
+    </select>
+    
+    <select id="batchGetUser" parameterType="java.util.Map" resultType="com.haoli.fate.domain.User">
+ 		select
 	        id,
-	        conferenceId,
-	        guestId,
-	        attributeId,
-	        value,
-	        isEmbeded,
-	        isChecked
+	        phone,
+	        userName,
+	        createTime,
+	        updateTime
 	    from
-	        t_guest_attribute
+	        t_user
 	    where
-	        conferenceId=#{conferenceId}
-	        <if test="attributeIds.size != 0 ">
-				And attributeId IN
-				<foreach collection="attributeIds" item="attributeId" index="index" open="(" close=")" separator=",">
-					#{attributeId}
+	        <if test="userIdList != null and userIdList.size != 0 ">
+				id in
+				<foreach collection="userIdList" item="userId" index="index" open="(" close=")" separator=",">
+					#{userId}
 				</foreach>
 			</if>
-	</select>
+    </select>
 	
 </mapper>

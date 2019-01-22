@@ -44,7 +44,9 @@ public class UserService {
 	}
 
 	public Map<String, Object> login(User user, String ip, String userAgent) throws Exception {
-		User dbUser = loadUserByPhone(user.getPhone());
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("userName", user.getUserName());
+		User dbUser = userDao.queryUser(params);
 		if(dbUser == null) {
 			throw new ConditionException("用户名或密码错误");
 		}
