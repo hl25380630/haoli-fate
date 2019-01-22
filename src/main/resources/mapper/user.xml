@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.haoli.fate.dao.UserDao">
+
+  	<sql id="CommonQuery">
+        <if test="id != null ">
+            and id=#{id}
+        </if>
+		<if test="userName != null and userName != '' ">
+			and userName like '%${userName}%'
+		</if>
+		<!-- 按时间段查询 -->
+		<if test="startDate != null and startDate != '' ">
+            and startDate <![CDATA[>]]> #{createTime}
+        </if>
+        <if test="endDate != null and endDate != '' ">
+            and endDate <![CDATA[<]]> #{createTime}
+        </if>
+    </sql>
+
+	<select id="queryUser" parameterType="java.util.Map" resultType="com.haoli.personalSite.domain.User">
+		select * from
+			t_user
+		<where>
+			<include refid="CommonQuery"/>
+		</where>
+	</select>
+	
+	<insert id="add" parameterType="com.haoli.personalSite.domain.User">
+		insert into
+			t_user(
+				userName,
+				password,
+				salt,
+				phone,
+				email,
+				createTime
+			)values(
+				#{userName},
+				#{password},
+				#{salt},
+				#{phone},
+				#{email},
+				#{createTime}
+			)
+	</insert>
+
+    <insert id="batchAdd" parameterType="java.util.Map">
+		insert into 
+		    t_guest_attribute (
+		        conferenceId,
+		        guestId,
+	 	        attributeId,
+	 	        value,
+	 	        isEmbeded,
+	 		    createTime
+	 		)
+ 		values
+ 		<foreach collection="list" item="item" index="index" separator=",">
+ 			(
+ 			    #{item.conferenceId},
+ 			    #{item.guestId},
+ 			    #{item.attributeId},
+ 			    #{item.value},
+ 			    #{item.isEmbeded},
+ 			    #{item.createTime}
+ 			)
+ 		</foreach>
+	</insert>
+
+	<update id="batchUpdate" parameterType="java.util.Map">
+		<foreach collection="list" item="item" index="index" open="" close="" separator=";">
+			update 
+				t_guest_attribute
+		    set
+		        value = #{item.value},
+		        updateTime = #{item.updateTime}
+			where 
+			    id = #{item.id}
+		</foreach>
+	</update>
+	
+	<select id="batchQuery" parameterType="java.util.Map" resultType="java.util.Map">
+	    select
+	        id,
+	        conferenceId,
+	        guestId,
+	        attributeId,
+	        value,
+	        isEmbeded,
+	        isChecked
+	    from
+	        t_guest_attribute
+	    where
+	        conferenceId=#{conferenceId}
+	        <if test="attributeIds.size != 0 ">
+				And attributeId IN
+				<foreach collection="attributeIds" item="attributeId" index="index" open="(" close=")" separator=",">
+					#{attributeId}
+				</foreach>
+			</if>
+	</select>
+	
+</mapper>
