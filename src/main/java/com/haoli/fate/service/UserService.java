@@ -63,9 +63,4 @@ public class UserService {
 		return result;
 	}
 	
-	public User loadUserByPhone(String phone) {
-		User user = userDao.loadUserByPhone(phone);
-		return user;
-	}
-
 }

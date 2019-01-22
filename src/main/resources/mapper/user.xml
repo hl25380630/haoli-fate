@@ -68,21 +68,6 @@
 			id = #{userId}
 	</update>
 	
-	<select id="loadById" parameterType = "java.lang.Long" resultType="com.haoli.fate.domain.User">
-		select
-		    id,
-		    phone,
-		    avatar,
-		    email,
-		    userName,
-		    password,
-		    salt
-		from
-			t_user
-		where
-		    id=#{id}
-	</select>
-	
 	<update id="resetPwd" parameterType = "com.haoli.fate.domain.User">
 		update
 			t_user
@@ -94,55 +79,5 @@
 			id = #{id}
 	</update>
 	
-	<select id="loadUserByPhone"  parameterType="java.lang.String" resultType="com.haoli.fate.domain.User">
-    	select 
-    		id,
-		    phone,
-		    userName,
-		    password,
-		    salt
-    	from
-    		t_user
-    	where
-    		phone=#{phone}
-    </select>
     
-    <select id="getUserInviteGuestNo" parameterType="java.util.Map" resultType="java.lang.Long">
-    	select
-    		count(1)
-    	from
-    		t_guest
-    	where
-    		conferenceId = #{conferenceId}
-    		and createUserId = #{userId}
-    </select>
-    
-    <select id="getUserInviteAgentQuota" parameterType="java.util.Map" resultType="java.lang.Long">
-    	select
-    		sum(totalAmount)
-    	from
-    		t_agent
-    	where
-    		conferenceId = #{conferenceId}
-    		and inviteBy = #{userId}
-    </select>
-    
-    <select id="batchGetUser" parameterType="java.util.Map" resultType="com.haoli.fate.domain.User">
- 		select
-	        id,
-	        phone,
-	        userName,
-	        createTime,
-	        updateTime
-	    from
-	        t_user
-	    where
-	        <if test="userIdList != null and userIdList.size != 0 ">
-				id in
-				<foreach collection="userIdList" item="userId" index="index" open="(" close=")" separator=",">
-					#{userId}
-				</foreach>
-			</if>
-    </select>
-	
 </mapper>
