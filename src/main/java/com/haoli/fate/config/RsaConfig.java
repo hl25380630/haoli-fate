@@ -14,7 +14,6 @@ public class RsaConfig {
 	@Value("${rsa.path}")
 	private String rsaKeyPath;
 	
-	
 	@Bean
 	public RSAKey getRsaKey() throws Exception {
 		String s = FileUtil.readFile(rsaKeyPath);
@@ -26,6 +25,5 @@ public class RsaConfig {
 		keys.setPublicKeyString(publicKey);
 		return keys;
 	}
-	
 
 }
