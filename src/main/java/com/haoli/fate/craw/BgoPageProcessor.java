@@ -4,14 +4,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.springframework.stereotype.Component;
 
 import us.codecraft.webmagic.Page;
 import us.codecraft.webmagic.Site;
 import us.codecraft.webmagic.Spider;
-import us.codecraft.webmagic.pipeline.JsonFilePipeline;
 import us.codecraft.webmagic.processor.PageProcessor;
 import us.codecraft.webmagic.selector.JsonPathSelector;
 
+
+@Component
 public class BgoPageProcessor implements PageProcessor{
 
     public static final String LIST_URL = "https://api\\.biligame\\.com/news/list.*";
@@ -54,7 +56,6 @@ public class BgoPageProcessor implements PageProcessor{
     	BgoPageProcessor bp = new BgoPageProcessor();
         Spider.create(bp)
         .addUrl("https://api.biligame.com/news/list.action?gameExtensionId=45&positionId=2&pageNum=1&pageSize=1&typeId=")
-        .addPipeline(new JsonFilePipeline("C:\\Users\\10063731\\Desktop\\personal"))
         .run();
     }
 }
