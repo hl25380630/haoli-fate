@@ -8,6 +8,10 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson.JSONObject;
@@ -58,6 +62,7 @@ public class BgoPageProcessor implements PageProcessor{
 		else {
 			Map<String, Object> map = new HashMap<String, Object>();
 			String content = new JsonPathSelector("$.data.content").select(page.getRawText());
+			content = this.processImgSrc(content, "https://");
 			String id = new JsonPathSelector("$.data.id").select(page.getRawText());
 			map.put("content", content);
 			map.put("id", id);
@@ -113,13 +118,39 @@ public class BgoPageProcessor implements PageProcessor{
 	}
 	
 	
+	/**
+     * 将文本中的相对地址转换成对应的绝对地址
+     * @param content
+     * @param baseUrl
+     * @return
+     */
+    public String processImgSrc(String content,String baseUrl){
+        Document document = Jsoup.parse(content);
+        document.setBaseUri(baseUrl);
+        Elements elements = document.select("img[src]");
+        for(Element el:elements){
+            String imgUrl = el.attr("src");
+            if (imgUrl.trim().startsWith("/")) {
+                el.attr("src", el.absUrl("src"));
+            }
+        }
+        return document.html();
+    }
+
+	
 
     public static void main(String[] args) {
     	BgoPageProcessor bp = new BgoPageProcessor();
         Spider.create(bp)
-        .addUrl("https://api.biligame.com/news/list.action?gameExtensionId=45&positionId=2&pageNum=1&pageSize=1&typeId=")
+        .addUrl("https://api.biligame.com/news/list.action?gameExtensionId=45&positionId=2&pageNum=1&pageSize=5&typeId=")
         .run();
         List<Map<String, Object>> newsList = bp.listNews();
-        System.out.println(newsList);
+        for(Map<String, Object> news : newsList) {
+        	String id = MapUtil.getString(news, "id");
+        	if("3139".equals(id)) {
+        		System.out.println(news);
+        	}
+        }
+        
     }
 }
