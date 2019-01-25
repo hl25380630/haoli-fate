@@ -53,8 +53,7 @@ public class BgoPageProcessor implements PageProcessor{
     public static void main(String[] args) {
     	BgoPageProcessor bp = new BgoPageProcessor();
         Spider.create(bp)
-        .addUrl("https://api.biligame.com/news/list.action?gameExtensionId=45&positionId=2&pageNum=1&pageSize=1&typeId=")
-        .addPipeline(new JsonFilePipeline("C:\\Users\\10063731\\Desktop\\personal"))
+        .addUrl("https://api.biligame.com/news/list.action?gameExtensionId=45&positionId=2&pageNum=1&pageSize=5&typeId=")
         .run();
     }
 }
