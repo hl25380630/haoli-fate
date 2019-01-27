@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.haoli.fate.dao.UserDao">
+
+	<sql id="CommonUpdate">
+		<if test="avatar != null and avatar != ''">
+			avatar = #{avatar},
+		</if>
+		<if test="userName != null and userName != ''">
+			userName = #{userName},
+		</if>
+		<if test="email != null and email != ''">
+			email = #{email},
+		</if>
+	</sql>
+	
+	<sql id="CommonQuery">
+        <if test="id != null ">
+            and id=#{id}
+        </if>
+		<if test="userName != null and userName != '' ">
+			and userName like '%${userName}%'
+		</if>
+		<!-- 按时间段查询 -->
+		<if test="startDate != null and startDate != '' ">
+            and startDate <![CDATA[>]]> #{createTime}
+        </if>
+        <if test="endDate != null and endDate != '' ">
+            and endDate <![CDATA[<]]> #{createTime}
+        </if>
+    </sql>
+	
+	<select id="queryUser" parameterType="java.util.Map" resultType="com.haoli.fate.domain.User">
+		select * from
+			t_user
+		<where>
+			<include refid="CommonQuery"/>
+		</where>
+	</select>
+
+	<insert id="add" parameterType="com.haoli.fate.domain.User">
+		insert into
+			t_news(
+				type,
+				title,
+				content,
+				createTime
+			)values(
+				#{type},
+				#{title},
+				#{content},
+				#{createTime}
+			)
+	</insert>
+	
+	<update id="update" parameterType="java.util.Map">
+		update
+			t_user
+		<set>
+			<include refid="CommonUpdate"/>
+			updateTime = #{updateTime}
+		</set>
+		where
+			id = #{userId}
+	</update>
+	
+	<update id="resetPwd" parameterType = "com.haoli.fate.domain.User">
+		update
+			t_user
+    	set
+			salt=#{salt},
+			password=#{password},
+    		updateTime = #{updateTime}
+		where
+			id = #{id}
+	</update>
+	
+    
+</mapper>

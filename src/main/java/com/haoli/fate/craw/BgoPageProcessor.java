@@ -16,7 +16,10 @@ import us.codecraft.webmagic.Spider;
 import us.codecraft.webmagic.processor.PageProcessor;
 import us.codecraft.webmagic.selector.JsonPathSelector;
 
-
+/**
+ * b站fgo新闻页爬虫工具，用于爬取b站最新的fgo新闻
+ * @author 李昊
+ */
 @Component
 public class BgoPageProcessor implements PageProcessor{
 
@@ -95,8 +98,6 @@ public class BgoPageProcessor implements PageProcessor{
 		}
 		return result;
 	}
-	
-	
 
     public static void main(String[] args) {
     	BgoPageProcessor bp = new BgoPageProcessor();
