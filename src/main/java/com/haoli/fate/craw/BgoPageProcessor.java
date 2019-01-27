@@ -1,14 +1,21 @@
 package com.haoli.fate.craw;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson.JSONObject;
+import com.haoli.sdk.web.util.MapUtil;
 
 import us.codecraft.webmagic.Page;
 import us.codecraft.webmagic.Site;
@@ -27,27 +34,42 @@ public class BgoPageProcessor implements PageProcessor{
 
     private Site site = Site.me().setSleepTime(3000);
     
-    List<String> newsList = new ArrayList<String>();
+    List<Map<String, Object>> newsList = new ArrayList<Map<String, Object>>();
     
-    List<String> newsDetailList = new ArrayList<String>();
+    List<Map<String, Object>> newsDetailList = new ArrayList<Map<String, Object>>();
 	
     @Override
     public void process(Page page) {
 		if (page.getUrl().regex(LIST_URL).match()) {
-			page.putField("title", new JsonPathSelector("$.data[*].title").selectList(page.getRawText()));
+			
 			List<String> idList = new JsonPathSelector("$.data[*].id").selectList(page.getRawText());
-			newsList = new JsonPathSelector("$.data[*]").selectList(page.getRawText());
-			page.putField("newsList", newsList);
+			List<String> tempNewsList = new JsonPathSelector("$.data[*]").selectList(page.getRawText());
+			for(String str : tempNewsList) {
+				Map<String, Object> map = new HashMap<String, Object>();
+				JSONObject jobj = JSONObject.parseObject(str);
+				String id = String.valueOf(jobj.get("id"));
+				String title = String.valueOf(jobj.get("title"));
+				String createTime = String.valueOf(jobj.get("createTime"));
+				map.put("id", id);
+				map.put("title", title);
+				map.put("createTime", createTime);
+				newsList.add(map);
+			}
 	        if (CollectionUtils.isNotEmpty(idList)) {
 	            for (String id : idList) {
 	                page.addTargetRequest("https://api.biligame.com/news/" + id + ".action");
 	            }
 	        }
+	        
 		}
 		else {
-			String newsDetail = new JsonPathSelector("$.data[*]").select(page.getRawText());
-	        newsDetailList.add(newsDetail);
-	        page.putField("newsDetailList", newsDetailList);
+			Map<String, Object> map = new HashMap<String, Object>();
+			String content = new JsonPathSelector("$.data.content").select(page.getRawText());
+			content = this.processImgSrc(content, "https://");
+			String id = new JsonPathSelector("$.data.id").select(page.getRawText());
+			map.put("content", content);
+			map.put("id", id);
+			newsDetailList.add(map);
 		}
 
     }
@@ -57,21 +79,20 @@ public class BgoPageProcessor implements PageProcessor{
         return site;
     }
     
-	public List<JSONObject> getResult() {
-		List<JSONObject> convertedNewsList = this.convert(newsList);
-		List<JSONObject> convertedNewsDetailList = this.convert(newsDetailList);
-		for(JSONObject news : convertedNewsList) {
-			String newsId = this.getValue("id", news);
-			for(JSONObject newsDetail : convertedNewsDetailList) {
-				String newsDetailId = this.getValue("id", newsDetail);
-				if(newsId.equals(newsDetailId)) {
-					String contentDetail = this.getValue("content", newsDetail);
-					news.put("contentDetail", contentDetail);
-				}
-			}
-		}
-		return convertedNewsList;
-	}
+    public List<Map<String, Object>> listNews() {
+    	for(Map<String, Object> news : newsList) {
+    		String id = MapUtil.getString(news, "id");
+    		for(Map<String, Object> newsDetail : newsDetailList) {
+    			String detailId = MapUtil.getString(newsDetail, "id");
+    			if(id.equals(detailId)) {
+    				String content = MapUtil.getString(newsDetail, "content");
+    				news.put("content", content);
+    			}
+    		}
+    	}
+    	return newsList;
+    }
+    
 	
 	public String getValue(String valueKey, JSONObject item) {
 		Object result = null;
@@ -98,12 +119,40 @@ public class BgoPageProcessor implements PageProcessor{
 		}
 		return result;
 	}
+	
+	
+	/**
+     * 将文本中的相对地址转换成对应的绝对地址
+     * @param content
+     * @param baseUrl
+     * @return
+     */
+    public String processImgSrc(String content,String baseUrl){
+        Document document = Jsoup.parse(content);
+        document.setBaseUri(baseUrl);
+        Elements elements = document.select("img[src]");
+        for(Element el:elements){
+            String imgUrl = el.attr("src");
+            if (imgUrl.trim().startsWith("/")) {
+                el.attr("src", el.absUrl("src"));
+            }
+        }
+        return document.html();
+    }
 
+	
     public static void main(String[] args) {
     	BgoPageProcessor bp = new BgoPageProcessor();
         Spider.create(bp)
-        .addUrl("https://api.biligame.com/news/list.action?gameExtensionId=45&positionId=2&pageNum=1&pageSize=1&typeId=")
+        .addUrl("https://api.biligame.com/news/list.action?gameExtensionId=45&positionId=2&pageNum=1&pageSize=5&typeId=")
         .run();
-        System.out.println("final result: " + bp.getResult());
+        List<Map<String, Object>> newsList = bp.listNews();
+        for(Map<String, Object> news : newsList) {
+        	String id = MapUtil.getString(news, "id");
+        	if("3139".equals(id)) {
+        		System.out.println(news);
+        	}
+        }
+        
     }
 }
