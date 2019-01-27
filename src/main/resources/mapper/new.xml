@@ -1,42 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.haoli.fate.dao.UserDao">
+<mapper namespace="com.haoli.fate.dao.NewsDao">
 
-	<sql id="CommonUpdate">
-		<if test="avatar != null and avatar != ''">
-			avatar = #{avatar},
-		</if>
-		<if test="userName != null and userName != ''">
-			userName = #{userName},
-		</if>
-		<if test="email != null and email != ''">
-			email = #{email},
-		</if>
-	</sql>
-	
-	<sql id="CommonQuery">
-        <if test="id != null ">
-            and id=#{id}
-        </if>
-		<if test="userName != null and userName != '' ">
-			and userName like '%${userName}%'
-		</if>
-		<!-- 按时间段查询 -->
-		<if test="startDate != null and startDate != '' ">
-            and startDate <![CDATA[>]]> #{createTime}
-        </if>
-        <if test="endDate != null and endDate != '' ">
-            and endDate <![CDATA[<]]> #{createTime}
-        </if>
-    </sql>
-	
-	<select id="queryUser" parameterType="java.util.Map" resultType="com.haoli.fate.domain.User">
-		select * from
-			t_user
-		<where>
-			<include refid="CommonQuery"/>
-		</where>
-	</select>
 
 	<insert id="add" parameterType="com.haoli.fate.domain.User">
 		insert into
@@ -53,27 +18,34 @@
 			)
 	</insert>
 	
-	<update id="update" parameterType="java.util.Map">
-		update
-			t_user
-		<set>
-			<include refid="CommonUpdate"/>
-			updateTime = #{updateTime}
-		</set>
-		where
-			id = #{userId}
-	</update>
+   <insert id="batchAdd" parameterType="java.util.Map">
+		insert into 
+		    t_news (
+		    	newsId,
+				type,
+				title,
+				content,
+				createTime
+	 		)
+ 		values
+ 		<foreach collection="newsList" item="item" index="index" separator=",">
+ 			(
+ 				#{item.newsId},
+ 			    #{item.type},
+ 			    #{item.title},
+ 			    #{item.content},
+ 			    #{item.createTime}
+ 			)
+ 		</foreach>
+	</insert>
 	
-	<update id="resetPwd" parameterType = "com.haoli.fate.domain.User">
-		update
-			t_user
-    	set
-			salt=#{salt},
-			password=#{password},
-    		updateTime = #{updateTime}
+	<select id="getNewsIdList" parameterType="java.util.Map" resultType="java.lang.Long">
+		select
+			newsId
+		from
+			t_news
 		where
-			id = #{id}
-	</update>
+			type = #{type}
+	</select>
 	
-    
 </mapper>

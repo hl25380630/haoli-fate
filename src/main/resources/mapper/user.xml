@@ -79,5 +79,10 @@
 			id = #{id}
 	</update>
 	
+	<select id="listAll" resultType="com.haoli.fate.domain.User">
+		select *
+		from
+			t_user
+	</select>
     
 </mapper>

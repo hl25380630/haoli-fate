@@ -2,6 +2,7 @@ package com.haoli.fate.service;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,6 +62,10 @@ public class UserService {
 		result.put("phone", dbUser.getPhone());
 		result.put("userName", dbUser.getUserName());
 		return result;
+	}
+	
+	public List<User> listAll() throws Exception {
+		return userDao.listAll();
 	}
 	
 }

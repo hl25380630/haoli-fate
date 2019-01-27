@@ -34,9 +34,9 @@ public class BgoPageProcessor implements PageProcessor{
 
     private Site site = Site.me().setSleepTime(3000);
     
-    List<Map<String, Object>> newsList = new ArrayList<Map<String, Object>>();
+    private List<Map<String, Object>> newsList = new ArrayList<Map<String, Object>>();
     
-    List<Map<String, Object>> newsDetailList = new ArrayList<Map<String, Object>>();
+    private List<Map<String, Object>> newsDetailList = new ArrayList<Map<String, Object>>();
 	
     @Override
     public void process(Page page) {
@@ -47,10 +47,10 @@ public class BgoPageProcessor implements PageProcessor{
 			for(String str : tempNewsList) {
 				Map<String, Object> map = new HashMap<String, Object>();
 				JSONObject jobj = JSONObject.parseObject(str);
-				String id = String.valueOf(jobj.get("id"));
+				String newsId = String.valueOf(jobj.get("id"));
 				String title = String.valueOf(jobj.get("title"));
 				String createTime = String.valueOf(jobj.get("createTime"));
-				map.put("id", id);
+				map.put("newsId", newsId);
 				map.put("title", title);
 				map.put("createTime", createTime);
 				newsList.add(map);
@@ -66,9 +66,9 @@ public class BgoPageProcessor implements PageProcessor{
 			Map<String, Object> map = new HashMap<String, Object>();
 			String content = new JsonPathSelector("$.data.content").select(page.getRawText());
 			content = this.processImgSrc(content, "https://");
-			String id = new JsonPathSelector("$.data.id").select(page.getRawText());
+			String newsDetailId = new JsonPathSelector("$.data.id").select(page.getRawText());
 			map.put("content", content);
-			map.put("id", id);
+			map.put("newsDetailId", newsDetailId);
 			newsDetailList.add(map);
 		}
 
@@ -81,9 +81,9 @@ public class BgoPageProcessor implements PageProcessor{
     
     public List<Map<String, Object>> listNews() {
     	for(Map<String, Object> news : newsList) {
-    		String id = MapUtil.getString(news, "id");
+    		String id = MapUtil.getString(news, "newsId");
     		for(Map<String, Object> newsDetail : newsDetailList) {
-    			String detailId = MapUtil.getString(newsDetail, "id");
+    			String detailId = MapUtil.getString(newsDetail, "newsDetailId");
     			if(id.equals(detailId)) {
     				String content = MapUtil.getString(newsDetail, "content");
     				news.put("content", content);
@@ -153,6 +153,22 @@ public class BgoPageProcessor implements PageProcessor{
         		System.out.println(news);
         	}
         }
-        
     }
+
+	public List<Map<String, Object>> getNewsList() {
+		return newsList;
+	}
+
+	public void setNewsList(List<Map<String, Object>> newsList) {
+		this.newsList = newsList;
+	}
+
+	public List<Map<String, Object>> getNewsDetailList() {
+		return newsDetailList;
+	}
+
+	public void setNewsDetailList(List<Map<String, Object>> newsDetailList) {
+		this.newsDetailList = newsDetailList;
+	}
+    
 }
