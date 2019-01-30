@@ -4,6 +4,8 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,10 +24,13 @@ public class UserApi {
 	@Autowired
 	private UserService userService;
 	
+	private Logger logger = LoggerFactory.getLogger(UserApi.class); 
+	
 	@PostMapping("/user/register")
 	public JsonResponse<String> register(@RequestBody User user) throws Exception {
-		 userService.register(user);
-		 return JsonResponse.success();
+		logger.info("register");
+		userService.register(user);
+		return JsonResponse.success();
 	}
 	
 	@PostMapping("/user/login")
@@ -33,5 +38,11 @@ public class UserApi {
 		String ip = IpUtil.getIP(httpRequest);
 		Map<String, Object> result = userService.login(userInfo, ip, userAgent);
 		return new JsonResponse<Map<String, Object>>(result);
+	}
+	
+	@PostMapping("/user/test")
+	public JsonResponse<String> test(@RequestBody User user) throws Exception {
+		logger.info("test user");
+		return JsonResponse.success();
 	}
 }
