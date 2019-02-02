@@ -140,21 +140,6 @@ public class BgoPageProcessor implements PageProcessor{
         return document.html();
     }
 
-	
-    public static void main(String[] args) {
-    	BgoPageProcessor bp = new BgoPageProcessor();
-        Spider.create(bp)
-        .addUrl("https://api.biligame.com/news/list.action?gameExtensionId=45&positionId=2&pageNum=1&pageSize=5&typeId=")
-        .run();
-        List<Map<String, Object>> newsList = bp.listNews();
-        for(Map<String, Object> news : newsList) {
-        	String id = MapUtil.getString(news, "id");
-        	if("3139".equals(id)) {
-        		System.out.println(news);
-        	}
-        }
-    }
-
 	public List<Map<String, Object>> getNewsList() {
 		return newsList;
 	}

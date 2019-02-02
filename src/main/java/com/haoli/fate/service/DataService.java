@@ -51,7 +51,7 @@ public class DataService {
 		Spider.create(bgoProcessor).addUrl(url).run();
 		List<Map<String, Object>> newsList = bgoProcessor.listNews();
 		Map<String, Object> qparams = new HashMap<String, Object>();
-		params.put("type", NewsConstant.NEWS_TYPE_BGO);
+		qparams.put("type", NewsConstant.NEWS_TYPE_BGO);
 		Set<Long> recordedBgoNewsIdSet = this.getNewsIdList(qparams);
 		List<Map<String, Object>> addList = new ArrayList<Map<String, Object>>();
 		for(Map<String, Object> news : newsList) {
