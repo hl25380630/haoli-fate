@@ -48,4 +48,22 @@
 			type = #{type}
 	</select>
 	
+	<select id="pageListBgoNews" parameterType="java.util.Map" resultType="com.haoli.fate.domain.BgoNews">
+		select * 
+		from
+			t_news
+		where
+			type = #{type}
+		order by id desc
+		limit #{start}, #{limit}
+	</select>
+	
+	<select id="pageCountBgoNews" parameterType="java.util.Map" resultType="java.lang.Integer">
+		select count(1)
+		from
+			t_news
+		where
+			type = #{type}
+	</select>
+	
 </mapper>

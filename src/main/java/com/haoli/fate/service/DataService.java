@@ -17,8 +17,10 @@ import org.springframework.transaction.annotation.Transactional;
 import com.haoli.fate.constant.NewsConstant;
 import com.haoli.fate.craw.BgoPageProcessor;
 import com.haoli.fate.dao.NewsDao;
+import com.haoli.fate.domain.BgoNews;
 import com.haoli.fate.domain.User;
 import com.haoli.sdk.web.domain.MailConfig;
+import com.haoli.sdk.web.domain.PageResult;
 import com.haoli.sdk.web.util.EmailUtil;
 import com.haoli.sdk.web.util.MapUtil;
 
@@ -89,6 +91,22 @@ public class DataService {
 	
 	public Set<Long> getNewsIdList(Map<String, Object> params){
 		return newsDao.getNewsIdList(params);
+	}
+
+	public PageResult<BgoNews> pageListBgoNews(Map<String, Object> params) {
+		Integer pageSize = MapUtil.getInteger(params, "pageSize");
+		Integer pageNo = MapUtil.getInteger(params, "pageNo");
+		Integer start = (pageNo-1)*pageSize;
+		Integer limit = pageSize;
+		params.put("start", start);
+		params.put("limit", limit);
+		params.put("type", "bgo");
+		Integer total = newsDao.pageCountBgoNews(params);
+		if(total == 0) {
+			return new PageResult<BgoNews>(0, new ArrayList<BgoNews>());
+		}
+		List<BgoNews> bgoNewsList = newsDao.pageListBgoNews(params);
+		return new PageResult<BgoNews>(total, bgoNewsList);
 	}
 
 }
