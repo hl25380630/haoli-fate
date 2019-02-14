@@ -19,5 +19,6 @@ public interface NewsDao {
 
 	List<BgoNews> pageListBgoNews(Map<String, Object> params);
 
+	BgoNews getBgoNewsDetail(Long id);
 
 }

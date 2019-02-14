@@ -49,7 +49,10 @@
 	</select>
 	
 	<select id="pageListBgoNews" parameterType="java.util.Map" resultType="com.haoli.fate.domain.BgoNews">
-		select * 
+		select
+			id,
+			title,
+			createTime 
 		from
 			t_news
 		where
@@ -64,6 +67,14 @@
 			t_news
 		where
 			type = #{type}
+	</select>
+	
+	<select id="getBgoNewsDetail" parameterType="java.lang.Long" resultType="com.haoli.fate.domain.BgoNews">
+		select *
+		from
+			t_news
+		where
+			id = #{id}
 	</select>
 	
 </mapper>

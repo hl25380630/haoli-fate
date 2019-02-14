@@ -109,4 +109,9 @@ public class DataService {
 		return new PageResult<BgoNews>(total, bgoNewsList);
 	}
 
+	public BgoNews getBgoNewsDetail(Long id) {
+		BgoNews bgoNews = newsDao.getBgoNewsDetail(id);
+		return bgoNews;
+	}
+
 }

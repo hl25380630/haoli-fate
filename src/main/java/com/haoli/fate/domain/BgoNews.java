@@ -13,6 +13,8 @@ public class BgoNews {
 	private String title;
 	
 	private Date createTime;
+	
+	private String content;
 
 	public Long getId() {
 		return id;
@@ -52,6 +54,14 @@ public class BgoNews {
 
 	public void setCreateTime(Date createTime) {
 		this.createTime = createTime;
+	}
+
+	public String getContent() {
+		return content;
+	}
+
+	public void setContent(String content) {
+		this.content = content;
 	}
 	
 }
