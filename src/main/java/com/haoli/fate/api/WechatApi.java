@@ -12,9 +12,10 @@ public class WechatApi {
 	
 	private Logger logger = LoggerFactory.getLogger(WechatApi.class);
 	
-	@GetMapping("/wx")
-	public JsonResponse<String> authServer(String data){
-		logger.info(data);
+	@GetMapping("/wechat/getMsg")
+	public JsonResponse<String> getWechatMsg(String signature, String timestamp,
+											String nonce, String echostr){
+		logger.info("success");
 		return null;
 	}
 
