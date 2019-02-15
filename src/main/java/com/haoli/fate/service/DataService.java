@@ -100,7 +100,7 @@ public class DataService {
 		Integer limit = pageSize;
 		params.put("start", start);
 		params.put("limit", limit);
-		params.put("type", "bgo");
+		params.put("type", NewsConstant.NEWS_TYPE_BGO);
 		Integer total = newsDao.pageCountBgoNews(params);
 		if(total == 0) {
 			return new PageResult<BgoNews>(0, new ArrayList<BgoNews>());
