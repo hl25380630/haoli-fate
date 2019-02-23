@@ -18,8 +18,5 @@ public class WechatApi {
 	public String getWechatMsg(HttpServletRequest request) throws Exception{
 		return wechatService.getWechatMsg(request);
 	}
-	
-	
-
 
 }
